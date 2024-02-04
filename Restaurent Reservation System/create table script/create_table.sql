@@ -51,6 +51,14 @@ CREATE TABLE IF NOT EXISTS review (
     restaurant_id INT REFERENCES restaurant(restaurant_id)
 );
 
+-- Table creation for 'make_reservation' to handle many-to-many relationship between 'user' and 'reservation'
+CREATE TABLE IF NOT EXISTS make_reservation (
+    user_id INT REFERENCES "user"(user_id),
+    reservation_id INT REFERENCES reservation(reservation_id),
+    PRIMARY KEY (user_id, reservation_id)
+);
+
+
 -- Table creation for 'log'
 CREATE TABLE IF NOT EXISTS log (
     log_id SERIAL PRIMARY KEY,
