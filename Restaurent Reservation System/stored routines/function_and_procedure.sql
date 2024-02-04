@@ -95,19 +95,19 @@ BEGIN
 END;
 $$;
 
-
--- Procedure for viewing a reservation
-CREATE OR REPLACE FUNCTION view_reservation(u_id INT, res_id INT)
+-- Function for viewing a reservation
+CREATE OR REPLACE FUNCTION view_reservation(u_id INT, requested_res_id INT)
 RETURNS TABLE(reservation_id INT, reservation_date DATE, start_time TIME, end_time TIME, table_capacity INT) AS $$
 BEGIN
-    RETURN QUERY SELECT r.reservation_id, r.date, r.start_time, r.end_time, t.capacity
+    RETURN QUERY SELECT r.reservation_id, r.date, CAST(r.start_time AS TIME), CAST(r.end_time AS TIME), t.capacity
     FROM reservation r
     JOIN "table" t ON r.table_id = t.table_id
-    WHERE r.reservation_id = res_id AND EXISTS (
-        SELECT 1 FROM make_reservation WHERE user_id = u_id AND reservation_id = res_id
+    WHERE r.reservation_id = requested_res_id AND EXISTS (
+        SELECT 1 FROM make_reservation mr WHERE mr.user_id = u_id AND mr.reservation_id = requested_res_id
     );
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- Procedure for editing a reservation
 CREATE OR REPLACE PROCEDURE edit_reservation(res_id INT, new_date DATE, new_start_time TIME, new_end_time TIME, new_table_id INT)
