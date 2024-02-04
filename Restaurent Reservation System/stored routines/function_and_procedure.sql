@@ -62,7 +62,13 @@ LANGUAGE plpgsql AS $$
 DECLARE
     reservation_count INT;
     existing_reservation_id INT;
+    full_start_time TIMESTAMP;
+    full_end_time TIMESTAMP;
 BEGIN
+    -- Construct full TIMESTAMP values for start and end times
+    full_start_time := res_date + res_start_time;
+    full_end_time := res_date + res_end_time;
+
     -- Check if the user has already made 3 reservations
     SELECT COUNT(*) INTO reservation_count FROM make_reservation WHERE user_id = u_id;
     IF reservation_count >= 3 THEN
@@ -71,9 +77,9 @@ BEGIN
 
     -- Check if the table is available (no overlapping reservations)
     SELECT reservation_id INTO existing_reservation_id FROM reservation
-    WHERE table_id = selected_table_id AND date = res_date AND NOT (
-        res_start_time >= end_time OR
-        res_end_time <= start_time
+    WHERE table_id = selected_table_id AND date = res_date AND (
+        full_start_time < end_time AND
+        full_end_time > start_time
     );
     IF existing_reservation_id IS NOT NULL THEN
         RAISE EXCEPTION 'Table is not available at the specified time.';
@@ -81,13 +87,14 @@ BEGIN
 
     -- Insert new reservation
     INSERT INTO reservation (date, start_time, end_time, table_id)
-    VALUES (res_date, res_start_time, res_end_time, selected_table_id) RETURNING reservation_id INTO reservation_count;
+    VALUES (res_date, full_start_time, full_end_time, selected_table_id) RETURNING reservation_id INTO reservation_count;
 
     -- Associate the reservation with the user
     INSERT INTO make_reservation (user_id, reservation_id)
     VALUES (u_id, reservation_count);
 END;
 $$;
+
 
 -- Procedure for viewing a reservation
 CREATE OR REPLACE FUNCTION view_reservation(u_id INT, res_id INT)
