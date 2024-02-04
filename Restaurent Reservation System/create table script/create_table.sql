@@ -1,56 +1,60 @@
--- Roles table
-CREATE TABLE roles (
+-- Table creation for 'role'
+CREATE TABLE IF NOT EXISTS role (
     role_id SERIAL PRIMARY KEY,
-    role_name VARCHAR(50) UNIQUE NOT NULL
+    role_name VARCHAR(255) NOT NULL
 );
 
--- Users table
-CREATE TABLE users (
+-- Table creation for 'user'
+CREATE TABLE IF NOT EXISTS "user" (
     user_id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    telephone VARCHAR(15),
-    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role_id INT REFERENCES roles(role_id)
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    role_id INT REFERENCES role(role_id)
 );
 
--- Restaurants table
-CREATE TABLE restaurants (
+-- Table creation for 'restaurant'
+CREATE TABLE IF NOT EXISTS restaurant (
     restaurant_id SERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    address TEXT,
-    telephone VARCHAR(15),
-    open_time TIME,
-    close_time TIME
+    name VARCHAR(255) NOT NULL,
+    branch VARCHAR(255),
+    address TEXT NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(255)
 );
 
--- Reservations table
-CREATE TABLE reservations (
+-- Table creation for 'table'
+CREATE TABLE IF NOT EXISTS "table" (
+    table_id SERIAL PRIMARY KEY,
+    capacity INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    restaurant_id INT REFERENCES restaurant(restaurant_id)
+);
+
+-- Table creation for 'reservation'
+CREATE TABLE IF NOT EXISTS reservation (
     reservation_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id),
-    restaurant_id INT REFERENCES restaurants(restaurant_id),
-    reservation_date DATE,
-    reservation_time TIME,
-    table_count INT CHECK (table_count BETWEEN 1 AND 3)
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    date DATE NOT NULL,
+    user_id INT REFERENCES "user"(user_id),
+    table_id INT REFERENCES "table"(table_id)
 );
 
--- Makes table (associative table for M:N relationship)
-CREATE TABLE makes (
-    user_id INT REFERENCES users(user_id),
-    reservation_id INT REFERENCES reservations(reservation_id),
-    PRIMARY KEY (user_id, reservation_id)
+-- Table creation for 'review'
+CREATE TABLE IF NOT EXISTS review (
+    review_id SERIAL PRIMARY KEY,
+    description TEXT,
+    user_id INT REFERENCES "user"(user_id),
+    restaurant_id INT REFERENCES restaurant(restaurant_id)
 );
 
--- Logs table
-CREATE TABLE logs (
+-- Table creation for 'log'
+CREATE TABLE IF NOT EXISTS log (
     log_id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(user_id),
-    action_type VARCHAR(50),
-    action_date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    type VARCHAR(50) NOT NULL,
+    date_time TIMESTAMP NOT NULL,
+    user_id INT REFERENCES "user"(user_id)
 );
-
--- Insert default roles
-INSERT INTO roles (role_name) VALUES ('admin'), ('user');
-
--- Enable cryptographic functions
-CREATE EXTENSION IF NOT EXISTS pgcrypto;

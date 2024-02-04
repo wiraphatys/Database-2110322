@@ -1,14 +1,29 @@
--- Trigger Function: Log user actions
-CREATE OR REPLACE FUNCTION log_user_action() RETURNS TRIGGER AS $$
+-- Trigger function for logging login actions
+CREATE OR REPLACE FUNCTION log_login()
+RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO logs (user_id, action_type, action_date_time)
-    VALUES (NEW.user_id, TG_ARGV[0], CURRENT_TIMESTAMP);
+    INSERT INTO log (type, date_time, user_id) VALUES ('login', CURRENT_TIMESTAMP, NEW.user_id);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger for logging user actions
-CREATE TRIGGER after_user_action
-AFTER INSERT OR UPDATE ON users
+-- Trigger for login
+CREATE TRIGGER trigger_log_login
+AFTER INSERT ON "user"
 FOR EACH ROW
-EXECUTE FUNCTION log_user_action(TG_ARGV[0]);
+EXECUTE FUNCTION log_login();
+
+-- Trigger function for logging logout actions
+CREATE OR REPLACE FUNCTION log_logout()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO log (type, date_time, user_id) VALUES ('logout', CURRENT_TIMESTAMP, NEW.user_id);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger for logout
+CREATE TRIGGER trigger_log_logout
+AFTER DELETE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION log_logout();
