@@ -1,0 +1,47 @@
+db.getCollection('orders_w_lines').aggregate(
+  [
+    { $unwind: { path: '$order_lines' } },
+    {
+      $lookup: {
+        from: 'product',
+        localField: 'order_lines.product_id',
+        foreignField: 'product_id',
+        as: 'product_detail'
+      }
+    },
+    {
+      $group: {
+        _id: '$order_lines.product_id',
+        orderCount: { $sum: 1 },
+        product_detail: {
+          $first: '$product_detail'
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$orderCount',
+        docs: {
+          $push: {
+            id: '$product_detail.product_id',
+            name: '$product_detail.product_name'
+          }
+        }
+      }
+    },
+    { $sort: { _id: -1 } },
+    { $limit: 1 },
+    { $unwind: { path: '$docs' } },
+    {
+      $project: {
+        _id: 0,
+        product_id: {
+          $arrayElemAt: ['$docs.id', 0]
+        },
+        product_description: {
+          $arrayElemAt: ['$docs.name', 0]
+        }
+      }
+    }
+  ]
+);
