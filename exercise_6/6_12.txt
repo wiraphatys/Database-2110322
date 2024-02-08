@@ -1,0 +1,28 @@
+[
+  {
+    $match: {
+      order_date: {
+        $gt: "2020-01-10",
+        $lt: "2020-01-15",
+      },
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      total_orders: {
+        $sum: 1,
+      },
+    },
+  },
+  {
+    $project:
+      /**
+       * specifications: The fields to
+       *   include or exclude.
+       */
+      {
+        _id: 0,
+      },
+  },
+]

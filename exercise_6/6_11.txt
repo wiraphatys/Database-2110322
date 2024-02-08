@@ -1,0 +1,41 @@
+[
+  {
+    $lookup: {
+      from: "order_w_lines",
+      localField: "customer_id",
+      foreignField: "customer_id",
+      as: "result",
+    },
+  },
+  {
+    $match:
+      {
+        result: {
+          $size: 0,
+        },
+      },
+  },
+  {
+    $group:
+      {
+        _id: "$customer_id",
+        customer_name: {
+          $first: "$customer_name",
+        },
+      },
+  },
+  {
+    $project:
+      {
+        customer_id: "$_id",
+        customer_name: "$customer_name",
+        _id: 0,
+      },
+  },
+  {
+    $sort:
+      {
+        customer_id: 1,
+      },
+  },
+]

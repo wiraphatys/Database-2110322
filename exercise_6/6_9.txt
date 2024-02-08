@@ -1,0 +1,38 @@
+[
+  {
+    $match: {
+      order_date: {
+        $gte: "2020-01-10",
+        $lte: "2020-01-15",
+      },
+    },
+  },
+  {
+    $lookup: {
+      from: "customer",
+      localField: "customer_id",
+      foreignField: "customer_id",
+      as: "joined",
+    },
+  },
+  {
+    $unwind: {
+      path: "$joined",
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      customer_id: 1,
+      customer_name: "$joined.customer_name",
+    },
+  },
+  {
+    $group: {
+      _id: "$customer_id",
+      customer_name: {
+        $first: "$customer_name",
+      },
+    },
+  },
+]

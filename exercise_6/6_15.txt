@@ -1,0 +1,5 @@
+use ordersystem
+
+db.product.find()
+db.customer.find()
+db.order_w_lines.find()

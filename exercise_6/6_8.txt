@@ -1,0 +1,42 @@
+[
+  {
+    $group: {
+      _id: "$customer_id",
+      order_count: {
+        $sum: 1,
+      },
+    },
+  },
+  {
+    $lookup: {
+      from: "customer",
+      localField: "_id",
+      foreignField: "customer_id",
+      as: "joined",
+    },
+  },
+  {
+    $unwind: {
+      path: "$joined",
+    },
+  },
+  {
+    $sort:
+      /**
+       * Provide any number of field/order pairs.
+       */
+      {
+        order_count: -1,
+      },
+  },
+  {
+    $project: {
+      _id: 0,
+      customer_name: "$joined.customer_name",
+      order_count: "$order_count",
+    },
+  },
+  {
+    $limit: 3,
+  },
+]
