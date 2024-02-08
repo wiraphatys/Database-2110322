@@ -1,0 +1,46 @@
+[
+  {
+    $unwind:
+      {
+        path: "$order_lines",
+      },
+  },
+  {
+    $group:
+      {
+        _id: "$order_lines.product_id",
+        product_count: {
+          $sum: "$order_lines.ordered_quantity",
+        },
+      },
+  },
+  {
+    $lookup:
+      {
+        from: "product",
+        localField: "_id",
+        foreignField: "product_id",
+        as: "join",
+      },
+  },
+  {
+    $sort:
+      {
+        product_count: -1,
+      },
+  },
+  {
+    $unwind:
+      {
+        path: "$join",
+      },
+  },
+  {
+    $project:
+      {
+        _id: 0,
+        product_id: "$_id",
+        product_name: "$join.product_name",
+      },
+  },
+]
