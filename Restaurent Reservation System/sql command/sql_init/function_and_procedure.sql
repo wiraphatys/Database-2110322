@@ -81,16 +81,23 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE PROCEDURE edit_reservation(res_id INT, new_date DATE, new_start_time TIME, new_end_time TIME, new_table_id INT, new_status VARCHAR)
 LANGUAGE plpgsql AS $$
+DECLARE
+    full_new_start_time TIMESTAMP;
+    full_new_end_time TIMESTAMP;
 BEGIN
+    full_new_start_time := new_date + new_start_time; -- Combine new_date and new_start_time
+    full_new_end_time := new_date + new_end_time;     -- Combine new_date and new_end_time
+
     UPDATE reserve SET
     date = new_date,
-    start_time = new_start_time,
-    end_time = new_end_time,
+    start_time = full_new_start_time, -- Use full timestamp
+    end_time = full_new_end_time,     -- Use full timestamp
     table_id = new_table_id,
     status = new_status
     WHERE reserve_id = res_id;
 END;
 $$;
+
 
 
 CREATE OR REPLACE PROCEDURE delete_reservation(res_id INT)

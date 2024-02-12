@@ -1,0 +1,1 @@
+CALL delete_reservation(1);

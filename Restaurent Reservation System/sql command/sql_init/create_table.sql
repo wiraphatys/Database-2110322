@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS restaurant (
 CREATE TABLE IF NOT EXISTS "table" (
     table_id SERIAL PRIMARY KEY,
     capacity INT NOT NULL,
-    status VARCHAR(50) NOT NULL,
     restaurant_id INT REFERENCES restaurant(restaurant_id)
 );
 

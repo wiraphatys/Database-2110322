@@ -1,0 +1,1 @@
+DELETE FROM reserve WHERE reserve_id = 2;

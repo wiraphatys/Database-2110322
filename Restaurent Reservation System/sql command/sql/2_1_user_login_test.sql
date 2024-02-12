@@ -1,0 +1,1 @@
+CALL user_login('testUser', 'testPass');

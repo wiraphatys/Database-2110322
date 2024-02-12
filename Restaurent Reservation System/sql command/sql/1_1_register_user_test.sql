@@ -1,0 +1,1 @@
+CALL register_user('testUser', 'testPass', 'Test Name', '1234567890', 'test@example.com', 2);
