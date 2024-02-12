@@ -1,6 +1,6 @@
 SELECT *
 FROM (
-    SELECT R.restaurant_id, R.branch, SUM(T.capacity) AS total_customer, DENSE_RANK() OVER(ORDER BY SUM(T.capacity) DESC) AS rank
+    SELECT R.restaurant_id, R.name, R.branch, SUM(T.capacity) AS total_customer, DENSE_RANK() OVER(ORDER BY SUM(T.capacity) DESC) AS rank
     FROM restaurant R
     JOIN "table" T ON R.restaurant_id = T.restaurant_id
     JOIN (

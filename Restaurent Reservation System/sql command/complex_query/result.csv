@@ -1,2 +1,2 @@
-"restaurant_id","branch","total_customer","rank"
-1,"Downtown","12","2"
+"restaurant_id","name","branch","total_customer","rank"
+1,"Gourmet Place","Downtown","12","2"
